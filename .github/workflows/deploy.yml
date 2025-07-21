@@ -68,6 +68,11 @@ jobs:
 
       - name: Terraform Apply - EKS
         working-directory: ${{ env.TF_DIR }}
+        env:
+          TF_VAR_region: ${{ env.REGION }}
+          TF_VAR_cluster_name: ${{ env.CLUSTER_NAME }}
+          TF_VAR_ecr_name: ${{ env.REPO_NAME }}
+          TF_VAR_jump_ssh_cidr: "0.0.0.0/0"
         run: terraform apply -auto-approve
 
       ### 3. Your app logic continues here...
@@ -148,8 +153,6 @@ jobs:
           echo "BACKEND_IMAGE=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${REPO_NAME}:backend${BUILD_NUMBER}" >> $GITHUB_ENV
 
 
-
-
       - name: Build and Push Frontend Image
         working-directory: ${{ env.APP_DIR }}/frontend
         run: |
@@ -171,8 +174,6 @@ jobs:
           echo "After update:"
           grep 'image:' $APP_DIR/k8s/backend-deployment.yaml
           grep 'image:' $APP_DIR/k8s/frontend-deployment.yaml
-
-
 
 
       ### 4. Deploy to Kubernetes
